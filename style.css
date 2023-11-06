@@ -7,8 +7,8 @@ body {
   margin: 0px;
 }
 :root {
-  --header-height: 70px;
-  --footer-height: 100px;
+  --header-height: 32pt;
+  --footer-height: 64pt;
   --sidebar-width: 300px;
 }
 div.page-wrapper{
@@ -44,6 +44,8 @@ div.results-page {
   min-width: 6.5in;
   max-width: 8.5in;
   margin: auto;
+  padding-top: 11pt;
+  padding-bottom: 11pt;
   background-color: darkgreen;
   box-shadow: 0px 0px 10px ;
 }
