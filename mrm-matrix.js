@@ -14,6 +14,7 @@ function GaussSeidel(A, x, b, N){
   console.assert(n == b.length, "size of x and b do not match");
   for (let r=0; r<n; r++) {
     console.assert(A[r].length == n, "size of A and x do not match");
+    console.assert(A[r][r] != 0, "diagonal element of A is 0");
   }
   for (let k=0; k<N; k++) { // iterations
     for (let j=0; j<n; j++) { 
