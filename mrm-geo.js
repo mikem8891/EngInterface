@@ -10,9 +10,10 @@
  * @typedef GeoConstraint2D
  * @prop {string} type constraint type
  * @prop {Point2D[]} points points the constraint applies to
- * @prop {Array<(function(): number)>} constraintEqs equation that is zero when  the constraint 
- * is satisfied
- * @prop {Array<Array<(function(): number)>>} constraintGrad deritative of the constraint
+ * @prop {Array<(function(): number)>} constraintEqs equation that is zero when 
+ * the constraint is satisfied
+ * @prop {Array<Array<(function(): number)>>} constraintGrad deritative of the 
+ * constraint
  */
 
 /**
@@ -20,11 +21,32 @@
  */
 class GeometricSystem2D {
 
-  constructor(){
+  constructor() {
     /** @type {Point2D[]} */
     this.points = [];
     /** @type {GeoConstraint2D[]} */
     this.constraints = [];
+  }
+
+
+  applyConstraints() {
+    /**@type {number[]} */
+    let constraintVec = [];
+    /**@type {number[][]} */
+    let constraintJac = [];
+    for (let i=0; i<this.constraints.length; i++) {
+      let constEqs   = this.constraints[i].constraintEqs;
+      let constGrads = this.constraints[i].constraintGrad;
+      if (constEqs.length != constGrads.length)
+        throw new Error("amount of constraint equations and gradients do not match");
+      for (let j=0; j<constEqs.length; j++) {
+        if (constGrads[j].length != 2*this.constraints[i].points.length)
+          throw new Error("amount of gradients and points do not match");
+        constraintVec.push(constEqs[j]());
+        constraintJac.push([]);
+        // TODO
+      }
+    }
   }
 
   /**
