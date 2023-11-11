@@ -9,10 +9,10 @@
 /**
  * @typedef GeoConstraint2D
  * @prop {string} type constraint type
- * @prop {Point2D[]} points points the constraint applies to
- * @prop {Array<(function(): number)>} constraintEqs equation that is zero when 
+ * @prop {number[]} indices indices of points the constraint applies to
+ * @prop {function(GeometricSystem2D): number[]} constraintEqs equation that is zero when 
  * the constraint is satisfied
- * @prop {Array<Array<(function(): number)>>} constraintGrad deritative of the 
+ * @prop {function(GeometricSystem2D): number[][]} constraintGrad deritative of the 
  * constraint
  */
 
@@ -28,7 +28,6 @@ class GeometricSystem2D {
     this.constraints = [];
   }
 
-
   applyConstraints() {
     /**@type {number[]} */
     let constraintVec = [];
@@ -40,7 +39,7 @@ class GeometricSystem2D {
       if (constEqs.length != constGrads.length)
         throw new Error("amount of constraint equations and gradients do not match");
       for (let j=0; j<constEqs.length; j++) {
-        if (constGrads[j].length != 2*this.constraints[i].points.length)
+        if (constGrads[j].length != 2*this.constraints[i].indices.length)
           throw new Error("amount of gradients and points do not match");
         constraintVec.push(constEqs[j]());
         constraintJac.push([]);
@@ -50,112 +49,147 @@ class GeometricSystem2D {
   }
 
   /**
-   * @param {Point2D} point 
-   * @param {number} value 
+   * @param {number} point index of point the constraint applies to
+   * @param {number} value fixed x value of the point
    * @returns {GeoConstraint2D}
    */
   static constFixedX(point, value) {
-    return {
+    /** @type {GeoConstraint2D} */
+    let constraint = {
       type: "fixed x",
-      points: [point],
-      constraintEqs: [() => point.x - value],
-      constraintGrad: [[() => 1, () => 0]]
+      indices: [point],
+      constraintEqs: (gs) => [gs.points[constraint.indices[0]].x - value],
+      constraintGrad: (_) => [[1, 0]]
     }
+    return constraint;
   }
 
   /**
-   * @param {Point2D} point 
-   * @param {number} value 
+   * @param {number} point index of point the constraint applies to
+   * @param {number} value fixed y value of the point
    * @returns {GeoConstraint2D}
    */
   static constFixedY(point, value) {
-    return {
+    /** @type {GeoConstraint2D} */
+    let constraint = {
       type: "fixed y",
-      points: [point],
-      constraintEqs: [() => point.y - value],
-      constraintGrad: [[() => 0, () => 1]]
+      indices: [point],
+      constraintEqs: (gs) => [gs.points[constraint.indices[0]].y - value],
+      constraintGrad: (_) => [[0, 1]]
     }
+    return constraint;
   }
 
   /**
-   * @param {Point2D} point0
-   * @param {Point2D} point1
+   * @param {number} point0
+   * @param {number} point1
    * @returns {GeoConstraint2D}
    */
   static constVert(point0, point1) {
-    return {
+    /** @type {GeoConstraint2D} */
+    let constraint = {
       type: "vert",
-      points: [point0, point1],
-      constraintEqs: [() => point0.x - point1.x],
-      constraintGrad: [
-        [() =>  1, () => 0],
-        [() => -1, () => 0]
+      indices: [point0, point1],
+      constraintEqs: (gs) => {
+        let p = gs.points;
+        let i = constraint.indices;
+        return [p[i[0]].x - p[i[1]].x];
+      },
+      constraintGrad: (_) => [
+        [ 1, 0],
+        [-1, 0]
       ]
     }
+    return constraint;
   }
   
   /**
-   * @param {Point2D} point0
-   * @param {Point2D} point1
+   * @param {number} point0
+   * @param {number} point1
    * @returns {GeoConstraint2D}
    */
   static constHorz(point0, point1) {
-    return {
+    /** @type {GeoConstraint2D} */
+    let constraint = {
       type: "horz",
-      points: [point0, point1],
-      constraintEqs: [() => point0.y - point1.y],
-      constraintGrad: [
-        [() => 0, () =>  1],
-        [() => 0, () => -1]
+      indices: [point0, point1],
+      constraintEqs: (gs) => {
+        let p = gs.points;
+        let i = constraint.indices;
+        return [p[i[0]].y - p[i[1]].y];
+      },
+      constraintGrad: (_) => [
+        [0,  1],
+        [0, -1]
       ]
     }
+    return constraint;
   }
 
   /**
-   * @param {Point2D} p0
-   * @param {Point2D} p1
+   * @param {number} p0
+   * @param {number} p1
    * @param {number} value distance between p0 and p1
    * @returns {GeoConstraint2D}
    */
   static constDist(p0, p1, value) {
-    return {
+    /** @type {GeoConstraint2D} */
+    let constraint = {
       type: "dist",
-      points: [p0, p1],
-      constraintEqs: [() => {
-        let dx = p1.x - p0.x;
-        let dy = p1.y - p0.y;
-        return dx*dx + dy*dy - value*value;
-      }],
-      constraintGrad: [
-        [() => p0.x - p1.x, () => p0.y - p1.y],
-        [() => p1.x - p0.x, () => p1.y - p0.y]
-      ]
+      indices: [p0, p1],
+      constraintEqs: (gs) => {
+        let p = gs.points;
+        let i = constraint.indices;
+        let dx = p[i[1]].x - p[i[0]].x;
+        let dy = p[i[1]].y - p[i[0]].y;
+        return [dx*dx + dy*dy - value*value];
+      },
+      constraintGrad: (gs) => {
+        let p = gs.points;
+        let i = constraint.indices;
+        let [p0, p1] = [p[i[0]], p[i[1]]];
+        return [
+          [p0.x - p1.x, p0.y - p1.y],
+          [p1.x - p0.x, p1.y - p0.y]
+        ]
+      }
     }
+    return constraint;
   }
   
   /**
-   * @param {Point2D} p0
-   * @param {Point2D} p1
-   * @param {Point2D} p2
+   * @param {number} p0
+   * @param {number} p1
+   * @param {number} p2
    * @returns {GeoConstraint2D}
    */
   static constColinear(p0, p1, p2) {
-    return {
+    /** @type {GeoConstraint2D} */
+    let constraint = {
       type: "colinear",
-      points: [p0, p1, p2],
-      constraintEqs: [() => {
+      indices: [p0, p1, p2],
+      constraintEqs: (gs) => {
+        let p = gs.points;
+        let i = constraint.indices;
+        let [p0, p1, p2] = [p[i[0]], p[i[1]], p[i[2]]];
         let ABx = p1.x - p0.x;
         let ABy = p1.y - p0.y;
         let ACx = p2.x - p0.x;
         let ACy = p2.y - p0.y;
-        return ABx * ACy - ABy * ACx;
-      }],
-      constraintGrad: [
-        [() => p1.y - p2.y, () => p2.x - p1.x],
-        [() => p2.y - p0.y, () => p0.x - p2.x],
-        [() => p0.y - p1.y, () => p1.x - p0.x]
-      ]
+        return [ABx * ACy - ABy * ACx];
+      },
+      constraintGrad: (gs) => {
+        let p = gs.points;
+        let i = constraint.indices;
+        let [p0, p1, p2] = [p[i[0]], p[i[1]], p[i[2]]];
+        return [
+          [p1.y - p2.y, p2.x - p1.x],
+          [p2.y - p0.y, p0.x - p2.x],
+          [p0.y - p1.y, p1.x - p0.x]
+        ];
+      }
     }
+    return constraint;
   }
 }
 
