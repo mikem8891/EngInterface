@@ -8,6 +8,7 @@
  * @param {number[]} x initial guess and result
  * @param {number[]} b 
  * @param {number} N number of interations
+ * @returns {number[]}
  */
 function GaussSeidelMethod(A, x, b, N){
   const n = x.length;

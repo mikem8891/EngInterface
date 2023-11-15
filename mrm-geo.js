@@ -55,7 +55,7 @@ class GeometricSystem2D {
     }
 //    console.log(constraintVec);
 //    console.log(constraintJac);
-    /** @type {(sum: number, val: number) => number} */
+    /** @type {function(number, number): number} */
     const squaredSum = (sum, val) => sum + val*val;
     /** @type {number} solution criteria */
     let solutionCrit = constraintVec.reduce(squaredSum, 0);
