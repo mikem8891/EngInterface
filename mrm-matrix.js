@@ -35,13 +35,13 @@ function GaussSeidelMethod(A, x, b, N){
 }
 
 
-test();
+if (require('node:process').argv[2] == 'test') test();
 function test(){
   let A = [ [ 16,  3],
             [ 7, -11]];
   let b = [11, 13];
   let x = [1, 1];
-  console.log(GaussSeidelMethod(A, x, b, 6));
+  console.log(GaussSeidelMethod(A, x, b, 20));
   console.log(x);
   A = [ [10, -1,  2,  0],
         [-1, 11, -1,  3],
@@ -49,12 +49,12 @@ function test(){
         [ 0,  3, -1,  8]];
   b = [6, 25, -11, 15];
   x = [0, 0, 0, 0];
-  console.log(GaussSeidelMethod(A, x, b, 4));
+  console.log(GaussSeidelMethod(A, x, b, 50));
   A = [ [10, -1,  2,  0],
         [-1,  0, -1,  3],
         [ 2, -1, 10, -1],
         [ 0,  3, -1,  8]];
   b = [6, 25, -11, 15];
   x = [0, 0, 0, 0];
-  console.log(GaussSeidelMethod(A, x, b, 4));
+  console.log(GaussSeidelMethod(A, x, b, 50));
 }
