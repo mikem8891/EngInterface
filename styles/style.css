@@ -7,8 +7,8 @@ body {
   margin: 0px;
 }
 :root {
-  --header-height: 32pt;
-  --footer-height: 64pt;
+  --header-height: 0px; /* 32pt */
+  --footer-height: 0px; /* 64pt */
   --sidebar-width: 300px;
 }
 div.page-wrapper{
@@ -27,7 +27,7 @@ div.main{
 }
 div.sidebar{
   float: left;
-  background-color: darkmagenta;
+  background-color: lightgoldenrodyellow;
   width: var(--sidebar-width);
   height: inherit;
   overflow: auto;
@@ -63,3 +63,26 @@ div.footer{
   height: var(--footer-height);
 }
 
+div.input-title {
+  font-size: 14pt;
+  font-weight: bold;
+}
+div.input-group {
+  display: table;
+  width: 100%;
+}
+div.input-line {
+  display: table-row;
+}
+div.input-label {
+  display: table-cell;
+  padding-right: 1ch;
+  text-align: right;
+  width: 40%;
+}
+div.input-cell {
+  display: table-cell;
+}
+input {
+  width: 15ch;
+}

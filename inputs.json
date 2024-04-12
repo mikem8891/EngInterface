@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Loads",
+    "inputs": [
+      {
+        "id": "force",
+        "type": "number",
+        "label": "Force",
+        "hint": "Force in pounds",
+        "value": "0",
+        "units": "lb"
+      },
+      {
+        "id": "moment",
+        "type": "number",
+        "label": "Moment",
+        "hint": "Moment in inch-pounds",
+        "value": "0",
+        "units": "in-lb"
+      }
+    ]
+  },
+  {
+    "title": "Dimensions",
+    "inputs": [
+      {
+        "id": "height",
+        "type": "number",
+        "label": "Height",
+        "hint": "Height in inches",
+        "value": "0",
+        "units": "in"
+      },
+      {
+        "id": "width",
+        "type": "number",
+        "label": "Width",
+        "hint": "Width in inches",
+        "value": "0",
+        "units": "in"
+      }
+    ]
+  }
+]
